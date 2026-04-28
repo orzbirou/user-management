@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { Store } from '@ngrx/store';
 
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { User } from '../../../../core/models/user.model';
 import { UserActions } from '../../store/user.actions';
 import { selectAllUsers, selectError, selectLoading } from '../../store/user.selectors';
@@ -21,6 +23,7 @@ import { selectAllUsers, selectError, selectLoading } from '../../store/user.sel
 export class UserListComponent implements OnInit {
   private readonly store = inject(Store);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   readonly users = this.store.selectSignal(selectAllUsers);
   readonly loading = this.store.selectSignal(selectLoading);
@@ -37,7 +40,19 @@ export class UserListComponent implements OnInit {
   }
 
   onDelete(user: User): void {
-    console.log('deleted', user);
-    this.store.dispatch(UserActions.deleteUser({ id: user.id }));
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '360px',
+      data: {
+        title: 'Delete User',
+        message: `Are you sure you want to delete "${user.username}"?`,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        console.log('deleted', user);
+        this.store.dispatch(UserActions.deleteUser({ id: user.id }));
+      }
+    });
   }
 }
