@@ -1,0 +1,61 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="user-form">
+
+  <!-- Email -->
+  <mat-form-field class="user-form__field">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" type="email" autocomplete="email" />
+    <mat-error>
+      @if (emailControl.errors?.['required']) {
+        Email is required
+      } @else if (emailControl.errors?.['email']) {
+        Invalid email format
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Username -->
+  <mat-form-field class="user-form__field">
+    <mat-label>Username</mat-label>
+    <input matInput formControlName="username" autocomplete="username" />
+    <mat-error>
+      @if (usernameControl.errors?.['required']) {
+        Username is required
+      } @else if (usernameControl.errors?.['minlength']) {
+        Minimum 3 characters required
+      } @else if (usernameControl.errors?.['maxlength']) {
+        Maximum 20 characters allowed
+      } @else if (usernameControl.errors?.['pattern']) {
+        Only Latin letters, numbers, and _ are allowed
+      } @else if (usernameControl.errors?.['noAdmin']) {
+        Username cannot be 'admin'
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Age -->
+  <mat-form-field class="user-form__field">
+    <mat-label>Age</mat-label>
+    <input matInput formControlName="age" type="number" min="18" max="100" />
+    <mat-error>
+      @if (ageControl.errors?.['required']) {
+        Age is required
+      } @else if (ageControl.errors?.['ageRange']) {
+        Age must be between 18 and 100
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Actions -->
+  <div class="user-form__actions">
+    <button type="button" mat-button (click)="onCancel()">Cancel</button>
+    <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      [disabled]="form.invalid || form.pristine"
+    >
+      Save
+    </button>
+  </div>
+
+</form>

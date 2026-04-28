@@ -1,0 +1,17 @@
+<div class="user-edit">
+  <h1 class="user-edit__title">Edit User</h1>
+
+  @if (loading()) {
+    <div class="user-edit__spinner">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (user()) {
+    <app-user-form
+      [user]="user()"
+      (formSubmit)="onFormSubmit($event)"
+      (cancel)="onCancel()"
+    />
+  } @else {
+    <p class="user-edit__not-found">User not found.</p>
+  }
+</div>

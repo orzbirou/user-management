@@ -51,7 +51,6 @@ export class UserListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
         console.log('deleted', user);
-        this.store.dispatch(UserActions.deleteUser({ id: user.id }));
       }
     });
   }

@@ -23,3 +23,6 @@ export const selectError = createSelector(
   selectUserState,
   (state: UserState) => state.error,
 );
+
+export const selectUserById = (id: number) =>
+  createSelector(selectUserState, (state: UserState) => state.entities[id]);
