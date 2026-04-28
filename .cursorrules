@@ -10,6 +10,7 @@ You are an expert Angular developer. Always follow these rules:
 - SCSS with BEM methodology.
 
 ## Modern Angular Best Practices
+- Use `ChangeDetectionStrategy.OnPush` for ALL components by default.
 - Use `inject()` for Dependency Injection (NO constructor injection).
 - NO code in constructors. Use `ngOnInit` if needed.
 - Use `const` and strictly typed interfaces (NO `any`).
