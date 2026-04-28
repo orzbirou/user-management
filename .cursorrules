@@ -1,0 +1,25 @@
+# Project Rules: User Management System
+
+You are an expert Angular developer. Always follow these rules:
+
+## Tech Stack
+- Angular 19+ (Standalone components, Functional providers).
+- NgRx (Action Groups, Reducers, Functional Effects).
+- Signals for UI data binding (using `store.selectSignal`).
+- Angular Material for UI components.
+- SCSS with BEM methodology.
+
+## Modern Angular Best Practices
+- Use `inject()` for Dependency Injection (NO constructor injection).
+- NO code in constructors. Use `ngOnInit` if needed.
+- Use `const` and strictly typed interfaces (NO `any`).
+- Use Functional Effects and Functional Interceptors.
+
+## Folder Structure
+- Feature-first: `src/app/features/users/` (store, components, services).
+- Core: `src/app/core/models/` for shared interfaces.
+
+## Implementation Guidelines
+- Reference `assignment.md` for specific logic and validation requirements.
+- Explain each code change at the line level.
+- After completing a task, suggest a concise 'git commit' command following Conventional Commits (e.g., feat:, fix:, docs:).
