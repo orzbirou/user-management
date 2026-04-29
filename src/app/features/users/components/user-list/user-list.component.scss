@@ -34,8 +34,90 @@
       max-width: 80px;
     }
 
+    // Both icon buttons (40px each) must always fit — prevent flex-shrink from hiding one
     .mat-column-actions {
-      max-width: 120px;
+      flex: 0 0 96px;
+    }
+
+    .user-list__row-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      // Table and rows switch from horizontal flex to stacked block
+      &,
+      mat-header-row,
+      mat-row {
+        display: block;
+      }
+
+      // Header is redundant — ::before labels replace it
+      mat-header-row {
+        display: none;
+      }
+
+      // Each row becomes a card
+      mat-row {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 0.25rem 0;
+        height: auto;
+      }
+
+      // Each cell is a label-left / value-right row
+      mat-cell {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        min-height: 2.5rem;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        overflow: visible;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        box-sizing: border-box;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          font-weight: 600;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: rgba(0, 0, 0, 0.54);
+          flex-shrink: 0;
+          margin-right: 1rem;
+        }
+
+        &.mat-column-id::before       { content: 'ID'; }
+        &.mat-column-email::before    { content: 'Email'; }
+        &.mat-column-username::before { content: 'Username'; }
+        &.mat-column-age::before      { content: 'Age'; }
+        &.mat-column-actions::before  { content: 'Actions'; }
+
+        // Reset the desktop flex-shrink lock — full card width is available
+        &.mat-column-actions {
+          flex: none;
+
+          .user-list__row-actions {
+            margin-left: auto;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 1rem;
+
+    &__title {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
     }
   }
 }
