@@ -1,59 +1,118 @@
-# UserManagement
+# Angular User Management
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+A test assignment demonstrating Angular 20, NgRx, Reactive Forms, and Angular Material best practices.
 
-## Development server
+---
 
-To start a local development server, run:
+## Prerequisites
+
+| Tool | Version |
+|---|---|
+| Node.js | 18+ |
+| Angular CLI | `npm i -g @angular/cli@20` |
+
+---
+
+## Getting Started
+
+**1. Install dependencies**
+
+```bash
+npm install
+```
+
+**2. Start the development server**
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**3. Open the application**
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+## Running Tests
 
 ```bash
-ng generate --help
+npm test
 ```
 
-## Building
+---
 
-To build the project run:
+## Architecture Decisions
 
-```bash
-ng build
-```
+### Standalone Components & Signals
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Every component is declared with `standalone: true` and imports only what it needs directly in its `@Component` decorator. There are no `NgModule` files. This reduces boilerplate, improves tree-shaking, and makes each component self-documenting.
 
-## Running unit tests
+UI state is consumed via `store.selectSignal()` instead of Observables + `AsyncPipe`. Signals integrate natively with Angular's reactivity graph: when a signal's value changes, only the components that read it are scheduled for re-render — no manual subscriptions, no `takeUntilDestroyed`, no memory-leak risk.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### NgRx Store with Entity Adapter
 
-```bash
-ng test
-```
+The users collection is managed by `@ngrx/entity`'s `createEntityAdapter`. This provides two key benefits over a plain array in state:
 
-## Running end-to-end tests
+- **Performance** — Users are stored as a dictionary (`entities: Record<id, User>`) alongside an ordered `ids` array. Looking up a single user by ID is O(1) instead of O(n).
+- **Simplicity** — `setAll`, `updateOne`, and `removeOne` replace manual `map` / `filter` / spread operations in the reducer, eliminating a common source of bugs.
 
-For end-to-end (e2e) testing, run:
+Selectors are built with `createSelector`, which memoises results using strict reference equality. A selector's projector function only re-runs when its input slice actually changes, preventing unnecessary recomputation downstream.
 
-```bash
-ng e2e
-```
+### Smart / Dumb Component Pattern
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The edit form is split into two components with clearly separated responsibilities:
 
-## Additional Resources
+| Component | Type | Knows about |
+|---|---|---|
+| `UserEditComponent` | Smart (Container) | NgRx Store, Router, `ActivatedRoute` |
+| `UserFormComponent` | Dumb (Presentational) | Reactive Forms, Angular Material |
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+`UserEditComponent` reads the `:id` route parameter, selects the matching `User` from the store via `store.selectSignal(selectUserById(id))`, and passes it down via a signal `input()`. It handles the submit and cancel events by navigating back to `/`.
+
+`UserFormComponent` owns the `FormGroup`, all validators, and all error messages. It receives `User | undefined` as an input signal and emits form values as outputs. It has zero knowledge of routing, the store, or NgRx — making it fully reusable. It is placed in `src/app/shared/components/` because it carries no feature-specific logic and could be used by any future feature (e.g. an "Add User" page) without modification.
+
+### OnPush Change Detection
+
+Every component is decorated with `changeDetection: ChangeDetectionStrategy.OnPush`. Angular skips the component's view during its default change-detection walk and only re-evaluates it when:
+
+- A signal it reads emits a new value, or
+- An `@Input()` reference changes, or
+- An event originating inside the component fires.
+
+Combined with memoised NgRx selectors (which only emit new references when data actually changes), this means the DOM is updated with surgical precision rather than on every browser event.
+
+---
+
+## Assumptions & Scope
+
+### Console logging instead of live mutation
+
+Per the assignment specification:
+
+- **Edit form submit** — the updated `User` object is output to `console.log`. No `updateUser` action is dispatched.
+- **Delete confirmation** — after confirming, the deleted `User` object is output to `console.log`. No `deleteUser` action is dispatched.
+
+The NgRx store wiring for `updateUser` and `deleteUser` (actions, reducer handlers, effects) is fully implemented to demonstrate architecture knowledge. The decision to log rather than dispatch on the UI is a deliberate compliance with the assignment's stated requirements.
+
+### Simulated 500 ms network delay
+
+The `loadUsers$` effect uses `delay(500)` on an in-memory mock array to simulate a real HTTP response. During this window, `loading` is `true` in the store and the list component shows a Material spinner. This demonstrates the full loading → success → error state cycle without requiring a backend.
+
+### No backend / no persistence
+
+Data lives in the NgRx store for the duration of the browser session. A page refresh resets the store to the original mock data. This is expected behaviour for an in-memory assignment.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Angular 20 (Standalone, Signals) |
+| State management | NgRx 20 (Store, Effects, Entity) |
+| UI components | Angular Material 20 |
+| Forms | Angular Reactive Forms |
+| Styling | SCSS with BEM methodology |
+| Language | TypeScript 5.8 |

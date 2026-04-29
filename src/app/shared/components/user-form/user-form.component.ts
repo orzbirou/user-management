@@ -9,34 +9,13 @@ import {
   OnInit,
   output,
 } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 import { User } from '../../../core/models/user.model';
-
-// --- Custom validators ---
-
-function noAdminValidator(control: AbstractControl): ValidationErrors | null {
-  return control.value?.toLowerCase() === 'admin' ? { noAdmin: true } : null;
-}
-
-function ageRangeValidator(min: number, max: number): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-    if (value === null || value === '') return null;
-    const num = Number(value);
-    return num >= min && num <= max ? null : { ageRange: { min, max } };
-  };
-}
+import { ageRangeValidator, noAdminValidator } from './user-form.validators';
 
 // --- Component ---
 
