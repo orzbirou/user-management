@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
@@ -17,10 +17,7 @@ export interface ConfirmDialogData {
 })
 export class ConfirmDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
-  private readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
-
-  readonly title = signal(this.data.title);
-  readonly message = signal(this.data.message);
+  readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
 
   onCancel(): void {
     this.dialogRef.close(false);
